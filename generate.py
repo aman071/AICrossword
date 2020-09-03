@@ -161,13 +161,15 @@ class CrosswordCreator():
         while len(arcs)!=0:
             (x,y)=arcs.pop()
 
-            if revise(x,y):
+            if self.revise(x,y):
                 if len(self.domains[x])==0:
                     return False
 
-                neighbors=self.crossword.neighbors(x) - y
-                arcs.add((x,z for each neighbor in neighbors))
+                neighbors=self.crossword.neighbors(x).discard(y)
+                print(neighbors)
+                arcs.append( tuple( [(x, z) for z in neighbors] ) )
 
+        print(self.domains)
         return True
 
 
