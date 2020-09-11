@@ -108,7 +108,7 @@ class CrosswordCreator():
                     self.domains[var].remove(dom_val)
 
         # print(self.domains)
-        # self.revise(Variable(1, 7, 'down', 7), Variable(2, 1, 'down', 5))
+        # self.revise(Variable(4, 4, 'across', 5), Variable(1, 7, 'down', 7))      #(Variable(4, 4, 'across', 5), Variable(1, 7, 'down', 7)): (3, 3) ; (Variable(4, 4, 'across', 5), Variable(2, 1, 'across', 12)): None
 
     def revise(self, x, y):
         """
@@ -124,7 +124,8 @@ class CrosswordCreator():
 
         revised=False
         if overlap_indices != None:
-            for x_word in self.domains[x].copy():
+            domain_copy=self.domains[x].copy()
+            for x_word in domain_copy:
                 equal_with=0
                 # print('Checking ',x_word)
 
@@ -157,19 +158,36 @@ class CrosswordCreator():
         """
         if arcs==None:
             arcs=list(self.crossword.overlaps.keys())
-        
+
+        # print(arcs)
+
         while len(arcs)!=0:
             (x,y)=arcs.pop()
+
+            # print(x)
+            # print(y)
+            # print(self.crossword.overlaps[x,y])
 
             if self.revise(x,y):
                 if len(self.domains[x])==0:
                     return False
 
-                neighbors=self.crossword.neighbors(x).discard(y)
-                print(neighbors)
-                arcs.append( tuple( [(x, z) for z in neighbors] ) )
+                # print('neighbors before discard: ', self.crossword.neighbors(x))
+                # print('to discard: ', y)
+                # self.crossword.neighbors(x).discard(y)
+                # print(self.crossword.neighbors(x))
 
-        print(self.domains)
+                for neighbor in self.crossword.neighbors(x):
+                    if neighbor != y:
+                        # print('appending', neighbor)
+                        arcs.append( (neighbor,x) ) 
+
+                    # else:
+                        # print('heloooooooooooooooooooooo')
+                        # print(neighbor)
+                        # print(y)
+
+        # print(self.domains)
         return True
 
 
@@ -178,7 +196,11 @@ class CrosswordCreator():
         Return True if `assignment` is complete (i.e., assigns a value to each
         crossword variable); return False otherwise.
         """
-        raise NotImplementedError
+        for var in assignment:
+            if assignment[var]==None:
+                return False
+        return True
+
 
     def consistent(self, assignment):
         """
